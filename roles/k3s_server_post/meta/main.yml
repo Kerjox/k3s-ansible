@@ -94,10 +94,10 @@ argument_specs:
 
       cilium_mode:
         description: Inner-node communication mode
-        default: native
+        default: tunnel
         choices:
           - native
-          - routed
+          - tunnel
 
       cluster_cidr:
         description: Inner-cluster IP range
