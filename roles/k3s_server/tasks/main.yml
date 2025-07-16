@@ -26,6 +26,20 @@
   ansible.builtin.include_tasks: vip.yml
   when: kube_vip_lb_ip_range is not defined and (not cilium_bgp or cilium_iface is not defined)
 
+- name: Set kernel parameters
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/90-kubelet.conf
+    state: present
+    reload: true
+  loop:
+    - { name: 'vm.panic_on_oom', value: '0' }
+    - { name: 'vm.overcommit_memory', value: '1' }
+    - { name: 'kernel.panic', value: '10' }
+    - { name: 'kernel.panic_on_oops', value: '1' }
+  when: k3s_protect_kernel_defaults | bool
+
 - name: Init cluster inside the transient k3s-init service
   ansible.builtin.command:
     cmd: systemd-run -p RestartSec=2 -p Restart=on-failure --unit=k3s-init k3s server {{ server_init_args }}

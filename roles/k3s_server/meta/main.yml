@@ -25,6 +25,11 @@ argument_specs:
         description: Name of the master group
         default: master
 
+      k3s_protect_kernel_defaults:
+        description: Protect kernel defaults
+        type: bool
+        default: true
+
       k3s_kubeconfig_mode:
         description: Mode for the kubeconfig file
         default: 600
