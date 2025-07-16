@@ -12,6 +12,8 @@ cilium_bgp_neighbors: []
 cilium_bgp_neighbors_groups: ['k3s_all']
 cilium_bgp_lb_cidr: 192.168.31.0/24
 cilium_hubble: true
+cilium_hubble_cli: true
+cilium_hubble_cli_version: v1.17.5
 cilium_mode: native
 
 cluster_cidr: 10.52.0.0/16

@@ -57,6 +57,15 @@ argument_specs:
         type: bool
         default: true
 
+      cilium_hubble_cli:
+        description: Enable Cilium Hubble CLI
+        type: bool
+        default: true
+
+      cilium_hubble_cli_version:
+        description: Version of Cilium Hubble CLI to install
+        default: v1.17.5
+
       cilium_iface:
         description: The network interface used for when Cilium is enabled
         default: ~

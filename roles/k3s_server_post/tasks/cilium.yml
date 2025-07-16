@@ -65,7 +65,7 @@
       block:
         - name: Set architecture variable
           ansible.builtin.set_fact:
-            cli_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+            cli_arch: 'amd64'
 
         - name: Download Cilium CLI and checksum
           ansible.builtin.get_url:
@@ -254,3 +254,49 @@
           changed_when: false
           loop_control:
             label: "{{ item }}"
+
+
+- name: Install Hubble CLI on master nodes
+  when:
+    - cilium_hubble
+    - cilium_hubble_cli
+    - inventory_hostname in groups[group_name_master | default('master')]
+  run_once: true
+  block:
+    - name: Set architecture variable
+      ansible.builtin.set_fact:
+        cli_arch: 'amd64'
+
+    - name: Download Hubble CLI and checksum
+      ansible.builtin.get_url:
+        url: "{{ cilium_hubble_base_url }}/hubble-linux-{{ cli_arch }}{{ item }}"
+        dest: /tmp/k3s/hubble-linux-{{ cli_arch }}{{ item }}
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - .tar.gz
+        - .tar.gz.sha256sum
+      vars:
+        cilium_hubble_base_url: https://github.com/cilium/hubble/releases/download/{{ cilium_hubble_cli_version }}
+
+    - name: Verify the downloaded tarball
+      ansible.builtin.shell: |
+        cd /tmp/k3s && sha256sum --check hubble-linux-{{ cli_arch }}.tar.gz.sha256sum
+      args:
+        executable: /bin/bash
+      changed_when: false
+
+    - name: Extract Hubble CLI to /usr/local/bin
+      ansible.builtin.unarchive:
+        src: /tmp/k3s/hubble-linux-{{ cli_arch }}.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+
+    - name: Remove downloaded tarball and checksum file
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/k3s/hubble-linux-{{ cli_arch }}.tar.gz
+        - /tmp/k3s/hubble-linux-{{ cli_arch }}.tar.gz.sha256sum
