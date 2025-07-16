@@ -174,6 +174,9 @@
         --helm-set k8sServicePort="6444"
         --helm-set routingMode={{ cilium_mode }}
         --helm-set autoDirectNodeRoutes={{ "true" if cilium_mode == "native" else "false" }}
+        {% if cilium_mode == "native" %}
+        --helm-set directRoutingSkipUnreachable={{ "true" if cilium_direct_routing_skip_unreachable else "false" }}
+        {% endif %}
         --helm-set kubeProxyReplacement={{ kube_proxy_replacement }}
         --helm-set bpf.masquerade={{ enable_bpf_masquerade }}
         --helm-set bgpControlPlane.enabled={{ cilium_bgp | default("false") }}

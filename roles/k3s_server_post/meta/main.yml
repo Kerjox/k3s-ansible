@@ -77,6 +77,11 @@ argument_specs:
           - native
           - tunnel
 
+      cilium_direct_routing_skip_unreachable:
+        description: If a BGP daemon is running and there is multiple native subnets to the cluster network, direct-routing-skip-unreachable true can be added alongside auto-direct-node-routes to give each node L2 connectivity in each zone without traffic always needing to be routed by the BGP routers. # yamllint disable-line rule:line-length
+        type: bool
+        default: true
+
       cluster_cidr:
         description: Inner-cluster IP range
         default: 10.52.0.0/16

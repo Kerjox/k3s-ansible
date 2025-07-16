@@ -15,6 +15,7 @@ cilium_hubble: true
 cilium_hubble_cli: true
 cilium_hubble_cli_version: v1.17.5
 cilium_mode: native
+cilium_direct_routing_skip_unreachable: true
 
 cluster_cidr: 10.52.0.0/16
 enable_bpf_masquerade: true
