@@ -5,6 +5,8 @@ k3s_kubectl_binary: k3s kubectl
 
 group_name_master: master
 
+k3s_kubeconfig_mode: 600
+
 kube_vip_arp: true
 kube_vip_iface:
 kube_vip_cloud_provider_tag_version: main
@@ -31,6 +33,7 @@ server_init_args: >-
     {% endif %}
     --token {{ k3s_token }}
   {% endif %}
+    --write-kubeconfig-mode={{ k3s_kubeconfig_mode }}
   {{ extra_server_args }}
 
 systemd_dir: /etc/systemd/system
