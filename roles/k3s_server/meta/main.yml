@@ -25,6 +25,18 @@ argument_specs:
         description: Name of the master group
         default: master
 
+      k3s_secrets_encryption:
+        description: Enable secrets encryption
+        type: bool
+        default: true
+
+      k3s_secrets_encryption_provider:
+        description: Provider for secrets encryption
+        default: aescbc
+        choices:
+          - aescbc
+          - secretbox
+
       k3s_protect_kernel_defaults:
         description: Protect kernel defaults
         type: bool

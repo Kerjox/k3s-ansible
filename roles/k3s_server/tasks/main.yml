@@ -40,6 +40,22 @@
     - { name: 'kernel.panic_on_oops', value: '1' }
   when: k3s_protect_kernel_defaults | bool
 
+- name: Create config directory
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/rancher/k3s/config.yaml
+    owner: root
+    group: root
+    mode: "0600"
+
 - name: Init cluster inside the transient k3s-init service
   ansible.builtin.command:
     cmd: systemd-run -p RestartSec=2 -p Restart=on-failure --unit=k3s-init k3s server {{ server_init_args }}
