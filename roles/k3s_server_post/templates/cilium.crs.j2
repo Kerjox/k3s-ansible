@@ -1,40 +1,53 @@
-apiVersion: "cilium.io/v2alpha1"
-kind: CiliumBGPPeeringPolicy
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPClusterConfig
 metadata:
- name: 01-bgp-peering-policy
-spec: # CiliumBGPPeeringPolicySpec
- virtualRouters: # []CiliumBGPVirtualRouter
- - localASN: {{ cilium_bgp_my_asn }}
-   exportPodCIDR: {{ cilium_exportPodCIDR | default('true') }}
-   neighbors: # []CiliumBGPNeighbor
+  name: 01-bgp-peering-policy
+spec: # CiliumBGPClusterConfigSpec
+  bgpInstances:
+    - name: "instance-{{ cilium_bgp_my_asn }}"
+      localASN: {{ cilium_bgp_my_asn }}
+      peers:
 {% if _cilium_bgp_neighbors | length > 0 %}
 {% for item in _cilium_bgp_neighbors %}
-    - peerAddress: '{{ item.peer_address + "/32"}}'
-      peerASN: {{ item.peer_asn }}
-      eBGPMultihopTTL: 10
-      connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
-      gracefulRestart:
-        enabled: true
-        restartTimeSeconds: 120
+        - name: peer-{{ item.peer_address }}
+          peerAddress: {{ item.peer_address }}
+          peerASN: {{ item.peer_asn }}
+          peerConfigRef:
+            name: cilium-peer
 {% endfor %}
 {% else %}
-    - peerAddress: '{{ cilium_bgp_peer_address + "/32"}}'
-      peerASN: {{ cilium_bgp_peer_asn }}
-      eBGPMultihopTTL: 10
-      connectRetryTimeSeconds: 120
-      holdTimeSeconds: 90
-      keepAliveTimeSeconds: 30
-      gracefulRestart:
-        enabled: true
-        restartTimeSeconds: 120
+        - name: "peer-{{ cilium_bgp_peer_address }}"
+          peerAddress: {{ cilium_bgp_peer_address }}
+          peerASN: {{ cilium_bgp_peer_asn }}
+          peerConfigRef:
+            name: cilium-peer
 {% endif %}
-   serviceSelector:
-      matchExpressions:
-         - {key: somekey, operator: NotIn, values: ['never-used-value']}
 ---
-apiVersion: "cilium.io/v2alpha1"
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPPeerConfig
+metadata:
+  name: cilium-peer
+spec:
+{% if cilium_bgp_md5_enabled %}
+  authSecretRef: {{ cilium_bgp_md5_secret_name }}
+{% endif %}
+  ebgpMultihop: {{ cilium_bgp_ebgp_multihop }}
+  timers:
+    connectRetryTimeSeconds: {{ cilium_bgp_connect_retry_time_seconds }}
+    holdTimeSeconds: {{ cilium_bgp_hold_time_seconds }}
+    keepAliveTimeSeconds: {{ cilium_bgp_keep_alive_time_seconds }}
+  gracefulRestart:
+    enabled: true
+    restartTimeSeconds: 15
+  families:
+    - afi: ipv4
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: "bgp"
+---
+apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: "01-lb-pool"
@@ -45,4 +58,20 @@ spec:
 {% else %}
   - start: {{ cilium_bgp_lb_cidr.split('-')[0] }}
     stop: {{ cilium_bgp_lb_cidr.split('-')[1] }}
+{% endif %}
+{% if cilium_exportPodCIDR | default(true) %}
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumBGPAdvertisement
+metadata:
+  name: bgp-advertisements
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+    - advertisementType: "PodCIDR"
+      attributes:
+        communities:
+          standard: [ "{{ cilium_bgp_my_asn }}:99" ]
+        localPreference: 99
 {% endif %}

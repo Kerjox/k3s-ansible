@@ -47,6 +47,36 @@ argument_specs:
         description: BGP load balancer IP range
         default: 192.168.31.0/24
 
+      cilium_bgp_connect_retry_time_seconds:
+        description: BGP connect retry time in seconds
+        type: int
+        default: 5
+
+      cilium_bgp_hold_time_seconds:
+        description: BGP hold time in seconds
+        type: int
+        default: 9
+
+      cilium_bgp_keep_alive_time_seconds:
+        description: BGP keep alive time in seconds
+        type: int
+        default: 3
+
+      cilium_bgp_ebgp_multihop:
+        description: Enable eBGP multihop
+        type: int
+        default: 1
+
+      cilium_bgp_md5_enabled:
+        description: Enable BGP MD5 authentication
+        type: bool
+        default: false
+
+      cilium_bgp_md5_password:
+        description: BGP MD5 password
+        type: str
+        default: ~
+
       cilium_exportPodCIDR:
         description: Export pod CIDR
         type: bool
