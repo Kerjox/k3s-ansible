@@ -24,7 +24,7 @@
 
 - name: Deploy vip manifest
   ansible.builtin.include_tasks: vip.yml
-  when: kube_vip_lb_ip_range is not defined and (not cilium_bgp or cilium_iface is not defined)
+  when: kube_vip_lb_ip_range is not defined
 
 - name: Set kernel parameters
   ansible.posix.sysctl:
