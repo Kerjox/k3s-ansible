@@ -23,8 +23,6 @@ Build a Kubernetes cluster using Ansible with k3s. The goal is easily install a 
 on processor architecture:
 
 - [X] x64
-- [X] arm64
-- [X] armhf
 
 ## ✅ System requirements
 
