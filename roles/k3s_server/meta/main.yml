@@ -56,6 +56,14 @@ argument_specs:
         default: false
         type: bool
 
+      kube_vip_pull_policy:
+        description: Image pull policy for kube-vip
+        default: IfNotPresent
+        choices:
+          - IfNotPresent
+          - Always
+          - Never
+
       kube_vip_arp:
         description: Enables kube-vip ARP broadcasts
         default: true

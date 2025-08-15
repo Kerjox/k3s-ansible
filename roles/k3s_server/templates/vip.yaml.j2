@@ -80,7 +80,7 @@ spec:
 {% endif %}
 {% endif %}
         image: ghcr.io/kube-vip/kube-vip:{{ kube_vip_tag_version }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ kube_vip_pull_policy }}
         name: kube-vip
         resources: {}
         securityContext:
